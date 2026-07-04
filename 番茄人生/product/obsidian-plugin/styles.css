@@ -1,0 +1,254 @@
+/* ── 番茄人生 Obsidian 插件 — 样式（与 pomofocus.html 原版严格一致） ── */
+/* 所有选择器加 .tomato-life-view 根作用域 + tl- 前缀，数值与原版完全相同 */
+
+.tomato-life-view {
+  font-family: 'ArialRounded', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  background: #ba4949;
+  min-height: 100%;
+  transition: background-color 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+  overflow-y: auto;
+  color: #fff;
+}
+
+.tomato-life-view.mode--break-short { background: #38858a; }
+.tomato-life-view.mode--break-long  { background: #397097; }
+
+/* ── card ── */
+.tomato-life-view .tl-card {
+  background: rgba(255, 255, 255, 0.1); border-radius: 6px;
+  max-width: 480px; width: 100%; margin: 32px 12px 0 12px; padding: 24px 0;
+}
+
+/* ── tabs ── */
+.tomato-life-view .tl-tabs {
+  display: flex; justify-content: center; margin-bottom: 20px; padding-top: 4px;
+}
+.tomato-life-view #tl-presetTabs { padding-top: 14px; }
+.tomato-life-view .tl-tab-btn {
+  background: none; border: none; color: #fff;
+  font-size: 14px; font-weight: 400; padding: 8px 14px; cursor: pointer;
+  border-radius: 4px; transition: 0.2s; width: 130px; text-align: center; flex-shrink: 0;
+  opacity: 0.5; font-family: inherit;
+}
+.tomato-life-view .tl-tab-btn.active { background: rgba(0, 0, 0, 0.15); opacity: 1; }
+
+/* ── timer ── */
+.tomato-life-view .tl-timer-wrap {
+  display: flex; justify-content: center; flex-direction: column; align-items: center;
+}
+.tomato-life-view .tl-timer-num {
+  font-size: 76px; font-weight: 700; color: #fff; padding: 34px 0;
+}
+
+/* ── Obsidian 主题重置 ── */
+.tomato-life-view button {
+  -webkit-appearance: none; border-radius: inherit; font-family: inherit;
+  box-shadow: none; letter-spacing: normal; text-transform: none;
+  background-image: none;
+}
+
+/* ── buttons ── */
+.tomato-life-view .tl-btn-start {
+  display: block; margin: 20px auto 16px;
+  padding: 14px 48px !important; font-size: 20px; font-weight: 700; letter-spacing: 1px;
+  background: #fff; border: 2px solid transparent; border-radius: 6px;
+  cursor: pointer; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  font-family: inherit; transition: 0.1s;
+  line-height: normal !important; -webkit-appearance: none; min-height: unset !important;
+  height: auto !important;
+}
+.tomato-life-view .tl-btn-start:active { transform: scale(0.96); }
+.tomato-life-view .tl-btn-start.is-paused {
+  background: none; color: #fff; box-shadow: none;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.tomato-life-view .tl-skip-btn {
+  display: block; margin: 0 auto; background: none; border: none;
+  color: rgba(255, 255, 255, 0.5); font-size: 14px; font-family: inherit; cursor: pointer;
+  padding: 4px 12px; height: 28px; line-height: 20px;
+}
+.tomato-life-view .tl-skip-btn:hover { color: #fff; }
+
+/* ── info / dot grid ── */
+.tomato-life-view .tl-info { text-align: center; padding: 18px 0; }
+.tomato-life-view .tl-dot-grid {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  max-width: 300px; margin: 0 auto;
+}
+.tomato-life-view .tl-grid-dot {
+  width: 14px; height: 14px; border-radius: 3px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.12); transition: background 0.3s;
+}
+.tomato-life-view .tl-grid-dot.lit { background: rgba(255, 255, 255, 0.7); }
+
+/* ── tasks wrap ── */
+.tomato-life-view .tl-tasks-wrap {
+  max-width: 480px; width: 100%; padding: 0 12px 60px;
+}
+.tomato-life-view .tl-tasks-head {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 480px; width: 100%; margin: 0 auto;
+  padding: 10px 0; border-bottom: 2px solid rgba(255, 255, 255, 0.15); margin-bottom: 8px;
+}
+.tomato-life-view .tl-tasks-head span { color: #fff; font-size: 16px; font-weight: 700; }
+.tomato-life-view .tl-tasks-head button {
+  background: rgba(255, 255, 255, 0.15); border: none; border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8); font-size: 13px; padding: 5px 12px; cursor: pointer; font-family: inherit;
+}
+.tomato-life-view .tl-tasks-head button:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ── task items ── */
+.tomato-life-view .tl-task {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff; border-radius: 5px; padding: 14px 16px; margin-bottom: 6px;
+}
+.tomato-life-view .tl-task-left {
+  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+}
+.tomato-life-view .tl-task-dot {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; flex-shrink: 0;
+  transition: 0.15s;
+}
+.tomato-life-view .tl-task-dot.done {
+  background: var(--tl-accent, #ba4949); border-color: var(--tl-accent, #ba4949);
+}
+.tomato-life-view .tl-task-text {
+  font-size: 15px; color: #555; font-weight: 400; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tomato-life-view .tl-task-text.done { text-decoration: line-through; color: #bbb; }
+.tomato-life-view .tl-task-pomos {
+  font-size: 12px; color: #aaa; margin-left: auto; flex-shrink: 0; margin-right: 8px;
+}
+.tomato-life-view .tl-task-del {
+  background: none; border: 1px solid #eee; border-radius: 4px;
+  width: 26px; height: 26px; cursor: pointer; color: #bbb; font-size: 14px;
+}
+.tomato-life-view .tl-est {
+  text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 13px; padding: 8px 0;
+}
+
+/* ── inline task add ── */
+.tomato-life-view .tl-add-input {
+  border: none; background: none; font-size: 15px; color: #555; flex: 1;
+  font-family: inherit; outline: none; min-width: 0; padding: 0;
+}
+.tomato-life-view .tl-add-input::placeholder { color: #bbb; }
+.tomato-life-view .tl-add-est {
+  width: 32px; padding: 3px 4px; border: 1px solid #ddd; border-radius: 4px;
+  text-align: center; font-size: 13px; font-family: inherit;
+}
+/* hide number input spinners */
+.tomato-life-view input[type=number] { -moz-appearance: textfield; }
+.tomato-life-view input[type=number]::-webkit-outer-spin-button,
+.tomato-life-view input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.tomato-life-view .tl-add-confirm {
+  background: #333; color: #fff; border: none; border-radius: 4px;
+  padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: inherit;
+}
+.tomato-life-view .tl-add-cancel {
+  background: none; border: none; color: #bbb; font-size: 16px; cursor: pointer;
+  padding: 2px 4px;
+}
+
+/* ── GTD Flow ── */
+.tomato-life-view .tl-gtd-board { display: flex; gap: 12px; padding: 12px 0; }
+.tomato-life-view .tl-gtd-col {
+  flex: 1 0 330px; display: flex; flex-direction: column;
+}
+.tomato-life-view .tl-gtd-col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 0 6px 0; margin-bottom: 6px;
+}
+.tomato-life-view .tl-gtd-col-header span {
+  color: #fff; font-size: 15px; font-weight: 700; line-height: 23px;
+}
+.tomato-life-view .tl-gtd-col-header button {
+  background: rgba(255, 255, 255, 0.12); border: none; border-radius: 4px;
+  color: rgba(255, 255, 255, 0.85); font-size: 13px; padding: 4px 10px;
+  cursor: pointer; font-family: inherit;
+}
+.tomato-life-view .tl-gtd-col-header button:hover { background: rgba(255, 255, 255, 0.2); }
+.tomato-life-view .tl-gtd-col-body {
+  flex: 1; padding: 10px 10px; overflow-y: auto; min-height: 80px;
+  background: #fff; border-radius: 6px;
+}
+.tomato-life-view .tl-gtd-col-item {
+  font-size: 14px; color: #555; padding: 10px 12px; margin-bottom: 6px;
+  background: #fff; border: 1px solid #eee; border-radius: 5px;
+  word-break: break-word; cursor: pointer;
+  display: flex; align-items: flex-start; gap: 4px;
+}
+.tomato-life-view .tl-gtd-col-item:hover { border-color: #ccc; }
+.tomato-life-view .tl-gtd-col-item.selected {
+  border-color: var(--tl-accent, #ba4949); box-shadow: 0 0 0 1px var(--tl-accent, #ba4949);
+}
+.tomato-life-view .tl-gtd-item-x {
+  background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer;
+  padding: 0 2px; line-height: 1; font-family: inherit; flex-shrink: 0;
+}
+.tomato-life-view .tl-gtd-item-x:hover { color: #c44; }
+.tomato-life-view .tl-gtd-action-bar {
+  display: flex; gap: 6px; padding: 4px 8px 8px 8px; align-items: center; flex-wrap: wrap;
+}
+.tomato-life-view .tl-gtd-action-bar button {
+  background: rgba(0, 0, 0, 0.05); border: 1px solid #ddd; border-radius: 4px;
+  font-size: 11px; color: #555; cursor: pointer; padding: 3px 8px;
+  font-family: inherit;
+}
+.tomato-life-view .tl-gtd-action-bar button:hover { background: rgba(0, 0, 0, 0.1); }
+.tomato-life-view .tl-gtd-action-bar .tl-gtd-act-done {
+  background: var(--tl-accent, #ba4949); color: #fff; border-color: transparent;
+}
+.tomato-life-view .tl-gtd-col-input {
+  display: flex; gap: 6px; margin-bottom: 6px;
+}
+.tomato-life-view .tl-gtd-col-input input {
+  flex: 1; border: 1px solid #ddd; border-radius: 5px; padding: 8px 10px;
+  font-size: 14px; font-family: inherit; outline: none; min-width: 0;
+  background: #fff; color: #555;
+}
+.tomato-life-view .tl-gtd-col-input input:focus { border-color: #bbb; }
+.tomato-life-view .tl-gtd-col-input input::placeholder { color: #bbb; }
+.tomato-life-view .tl-gtd-col-input button.tl-gtd-add-btn {
+  background: rgba(255, 255, 255, 0.12); border: none; border-radius: 4px;
+  color: rgba(255, 255, 255, 0.85); font-size: 13px; padding: 4px 10px; font-weight: 400;
+}
+.tomato-life-view .tl-gtd-col-input button.tl-gtd-add-btn:hover { background: rgba(255, 255, 255, 0.2); }
+.tomato-life-view .tl-gtd-col-empty {
+  text-align: center; color: #ccc; font-size: 13px; padding: 12px 0;
+}
+
+/* ── clarify guide ── */
+.tomato-life-view .tl-gtd-guide {
+  font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 8px;
+  padding: 10px 12px; background: rgba(0, 0, 0, 0.025); border-radius: 5px;
+}
+.tomato-life-view .tl-gtd-guide b { color: #555; }
+.tomato-life-view .tl-gtd-guide .tl-guide-no { color: #c44; }
+.tomato-life-view .tl-gtd-guide .tl-guide-yes { color: #3a8; }
+
+/* ── custom duration editor ── */
+.tomato-life-view .tl-free-edit-toggle {
+  text-align: center; margin-top: 24px; margin-bottom: 8px;
+}
+.tomato-life-view .tl-click-change {
+  color: rgba(255, 255, 255, 0.4); font-size: 13px; cursor: pointer;
+}
+.tomato-life-view .tl-dur-edit { text-align: center; padding: 6px 0 0 0; }
+.tomato-life-view .tl-dur-edit input {
+  width: 54px; background: #fff; border: 2px solid transparent; border-radius: 6px;
+  text-align: center; font-size: 14px; font-weight: 700; font-family: inherit;
+  padding: 4px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); outline: none;
+}
+.tomato-life-view .tl-dur-edit button {
+  background: #fff; color: var(--tl-accent, #7a5c8a); border: 2px solid transparent;
+  border-radius: 6px; padding: 4px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: inherit; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

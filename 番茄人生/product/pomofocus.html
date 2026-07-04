@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomofocus · Reference</title>
+<style>
+  @font-face {
+    font-family: 'ArialRounded';
+    src: local('Arial Rounded MT Bold');
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'ArialRounded', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    background: #ba4949;
+    min-height: 100vh;
+    transition: background-color 0.5s ease;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: env(safe-area-inset-top);
+  }
+  body.mode--break-short { background: #38858a; }
+  body.mode--break-long  { background: #397097; }
+
+  .card {
+    background: rgba(255,255,255,0.1); border-radius: 6px;
+    max-width: 480px; width: 100%; margin: 32px 12px 0 12px; padding: 24px 0;
+  }
+
+  /* tabs */
+  .tabs { display: flex; justify-content: center; margin-bottom: 20px; padding-top: 4px; }
+  #presetTabs { padding-top: 14px; }
+  .tab-btn {
+    background: none; border: none; color: #fff;
+    font-size: 14px; font-weight: 400; padding: 8px 14px; cursor: pointer;
+    border-radius: 4px; transition: 0.2s; width: 130px; text-align: center; flex-shrink: 0;
+    opacity: 0.5;
+  }
+  .tab-btn.active { background: rgba(0,0,0,0.15); opacity: 1; }
+
+  /* timer */
+  .timer-wrap { display: flex; justify-content: center; flex-direction: column; align-items: center; }
+  .timer-ring { position: relative; display: flex; align-items: center; justify-content: center; }
+
+  .timer-num {
+    font-size: 76px; font-weight: 700; color: #fff; padding: 34px 0;
+  }
+
+  /* button */
+  .btn-start {
+    display: block; margin: 20px auto 16px;
+    padding: 14px 48px; font-size: 20px; font-weight: 700; letter-spacing: 1px;
+    background: #fff; border: 2px solid transparent; border-radius: 6px;
+    cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    font-family: inherit; transition: 0.1s;
+  }
+  .btn-start:active { transform: scale(0.96); }
+  .btn-start.is-paused {
+    background: none; color: #fff; box-shadow: none;
+    border: 2px solid rgba(255,255,255,0.35);
+  }
+
+  .skip-btn {
+    display: block; margin: 0 auto; background: none; border: none;
+    color: rgba(255,255,255,0.5); font-size: 14px; font-family: inherit; cursor: pointer;
+    padding: 4px 12px; height: 28px; line-height: 20px;
+  }
+  .skip-btn:hover { color: #fff; }
+
+  /* info */
+  .info { text-align: center; padding: 18px 0 18px 0; }
+  .grid-dot {
+    width: 14px; height: 14px; border-radius: 3px; cursor: pointer;
+    background: rgba(255,255,255,0.12); transition: background 0.3s;
+  }
+  .grid-dot.lit { background: rgba(255,255,255,0.7); }
+
+  /* tasks */
+  .tasks-wrap { max-width: 480px; width: 100%; padding: 0 12px 60px; }
+  .tasks-head {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 480px; width: 100%; margin: 0 auto;
+    padding: 10px 0; border-bottom: 2px solid rgba(255,255,255,0.15); margin-bottom: 8px;
+  }
+  .tasks-head span { color: #fff; font-size: 16px; font-weight: 700; }
+  .tasks-head button {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 4px;
+    color: rgba(255,255,255,0.8); font-size: 13px; padding: 5px 12px; cursor: pointer; font-family: inherit;
+  }
+  .task {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border-radius: 5px; padding: 14px 16px; margin-bottom: 6px;
+  }
+  .task-left { display: flex; align-items: center; gap: 10px; flex:1; min-width:0; }
+  .task-dot {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .task-dot.done { background: var(--accent, #ba4949); border-color: var(--accent, #ba4949); }
+  .task-text { font-size: 15px; color: #555; font-weight: 400; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .task-text.done { text-decoration: line-through; color: #bbb; }
+  .task-pomos { font-size: 12px; color: #aaa; margin-left: auto; flex-shrink: 0; margin-right: 8px; }
+  .task-del { background: none; border: 1px solid #eee; border-radius: 4px; width: 26px; height: 26px; cursor: pointer; color: #bbb; font-size: 14px; }
+  .est { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; padding: 8px 0; }
+
+  /* inline task add */
+  .add-input {
+    border: none; background: none; font-size: 15px; color: #555; flex: 1;
+    font-family: inherit; outline: none; min-width: 0; padding: 0;
+  }
+  .add-input::placeholder { color: #bbb; }
+  .add-est {
+    width: 32px; padding: 3px 4px; border: 1px solid #ddd; border-radius: 4px;
+    text-align: center; font-size: 13px; font-family: inherit;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .add-confirm {
+    background: #333; color: #fff; border: none; border-radius: 4px;
+    padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .add-cancel {
+    background: none; border: none; color: #bbb; font-size: 16px; cursor: pointer;
+    padding: 2px 4px;
+  }
+
+  /* GTD Flow - horizontal framework */
+  #gtdContent { margin: 0; }
+  .gtd-board { display: flex; gap: 12px; padding: 12px 0; }
+  .gtd-col {
+    flex: 1 0 330px; display: flex; flex-direction: column;
+  }
+  .gtd-col-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 0 6px 0; margin-bottom: 6px;
+  }
+  .gtd-col-header span { color: #fff; font-size: 15px; font-weight: 700; line-height: 23px; }
+  .gtd-col-header button {
+    background: rgba(255,255,255,0.12); border: none; border-radius: 4px;
+    color: rgba(255,255,255,0.85); font-size: 13px; padding: 4px 10px;
+    cursor: pointer; font-family: inherit;
+  }
+  .gtd-col-header button:hover { background: rgba(255,255,255,0.2); }
+  .gtd-col-body {
+    flex: 1; padding: 10px 10px; overflow-y: auto; min-height: 80px;
+    background: #fff; border-radius: 6px;
+  }
+  .gtd-col-item {
+    font-size: 14px; color: #555; padding: 10px 12px; margin-bottom: 6px;
+    background: #fff; border: 1px solid #eee; border-radius: 5px;
+    word-break: break-word; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 4px;
+  }
+  .gtd-col-item:hover { border-color: #ccc; }
+  .gtd-col-item.selected { border-color: var(--accent,#ba4949); box-shadow: 0 0 0 1px var(--accent,#ba4949); }
+  .gtd-item-x {
+    background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer;
+    padding: 0 2px; line-height: 1; font-family: inherit; flex-shrink: 0;
+  }
+  .gtd-item-x:hover { color: #c44; }
+  .gtd-action-bar {
+    display: flex; gap: 6px; padding: 4px 8px 8px 8px; align-items: center; flex-wrap: wrap;
+  }
+  .gtd-action-bar button {
+    background: rgba(0,0,0,0.05); border: 1px solid #ddd; border-radius: 4px;
+    font-size: 11px; color: #555; cursor: pointer; padding: 3px 8px;
+    font-family: inherit;
+  }
+  .gtd-action-bar button:hover { background: rgba(0,0,0,0.1); }
+  .gtd-action-bar .gtd-act-done { background: var(--accent,#ba4949); color: #fff; border-color: transparent; }
+  .gtd-col-input {
+    display: flex; gap: 6px; margin-bottom: 6px;
+  }
+  .gtd-col-input input {
+    flex: 1; border: 1px solid #ddd; border-radius: 5px; padding: 8px 10px;
+    font-size: 14px; font-family: inherit; outline: none; min-width: 0;
+    background: #fff; color: #555;
+  }
+  .gtd-col-input input:focus { border-color: #bbb; }
+  .gtd-col-input input::placeholder { color: #bbb; }
+  .gtd-col-input button {
+    background: rgba(0,0,0,0.06); border: 1px solid #ddd; border-radius: 5px;
+    font-size: 14px; padding: 8px 14px; cursor: pointer; font-family: inherit;
+    color: #666; flex-shrink: 0; font-weight: 700;
+  }
+  .gtd-col-input button.gtd-add-btn {
+    background: rgba(255,255,255,0.12); border: none; border-radius: 4px;
+    color: rgba(255,255,255,0.85); font-size: 13px; padding: 4px 10px; font-weight: 400;
+  }
+  .gtd-col-input button.gtd-add-btn:hover { background: rgba(255,255,255,0.2); }
+  .gtd-col-input button:hover { background: rgba(0,0,0,0.1); }
+  .gtd-col-empty { text-align: center; color: #ccc; font-size: 13px; padding: 12px 0; }
+  /* Clarify guide */
+  .gtd-guide {
+    font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 8px;
+    padding: 10px 12px; background: rgba(0,0,0,0.025); border-radius: 5px;
+  }
+  .gtd-guide b { color: #555; }
+  .gtd-guide .gtd-guide-no { color: #c44; }
+  .gtd-guide .gtd-guide-yes { color: #3a8; }
+</style>
+</head>
+<body>
+<!-- 模式层 -->
+<div class="tabs" id="presetTabs">
+  <button class="tab-btn active" data-preset="25/5">25/5</button>
+  <button class="tab-btn" data-preset="52/17">52/17</button>
+  <button class="tab-btn" data-preset="90">90/25</button>
+  <button class="tab-btn" data-preset="custom">Custom</button>
+</div>
+<!-- 状态层 -->
+<div class="tabs" id="subTabs">
+</div>
+
+<div class="card">
+  <div class="timer-wrap">
+    <div class="timer-ring" style="display:flex;align-items:center;justify-content:center;">
+      <div class="timer-num" id="time">25:00</div>
+    </div>
+  </div>
+</div>
+
+<button class="btn-start" id="startBtn" onclick="toggle()">START</button>
+<button class="skip-btn" id="skipBtn" style="visibility:hidden" onclick="skip()">Skip</button>
+
+<!-- 自由模式时长编辑区 -->
+<div id="freeEditToggle" style="display:none;text-align:center;margin-top:24px;margin-bottom:8px">
+  <span id="clickToChange" onclick="toggleDurEdit()" style="color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer">Click to change</span>
+  <div id="durEdit" style="display:none;text-align:center;padding:6px 0 0 0">
+    <input id="durFocus" type="number" min="1" max="300" style="width:54px;background:#fff;border:2px solid transparent;border-radius:6px;text-align:center;font-size:14px;font-weight:700;font-family:inherit;padding:4px 0;box-shadow:0 2px 4px rgba(0,0,0,0.1);outline:none"> <span style="color:rgba(255,255,255,0.6)">min focus</span>
+    <span style="color:rgba(255,255,255,0.3);margin:0 6px">/</span>
+    <input id="durBreak" type="number" min="1" max="120" style="width:54px;background:#fff;border:2px solid transparent;border-radius:6px;text-align:center;font-size:14px;font-weight:700;font-family:inherit;padding:4px 0;box-shadow:0 2px 4px rgba(0,0,0,0.1);outline:none"> <span style="color:rgba(255,255,255,0.6)">min break</span>
+    <button onclick="saveDuration()" style="background:#fff;color:var(--accent,#7a5c8a);border:2px solid transparent;border-radius:6px;padding:4px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 4px rgba(0,0,0,0.1)">OK</button>
+  </div>
+</div>
+
+<div class="info">
+  <div id="dotGrid" style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:300px;margin:0 auto;"></div>
+</div>
+
+<!-- 任务模式标签 -->
+<div class="tabs" id="taskModeTabs" style="margin-top:6px;margin-bottom:0">
+  <button class="tab-btn active" data-taskmode="tasks">Tasks</button>
+  <button class="tab-btn" data-taskmode="gtd">GTD</button>
+</div>
+
+<!-- 任务区（共用容器，白线不移动） -->
+<div class="tasks-wrap">
+  <div class="tasks-head">
+    <span id="taskModeLabel">Tasks</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button id="addTaskBtn" onclick="add()">+ Add Task</button>
+      <button onclick="exportMD()">.md ↓</button>
+      <button onclick="document.getElementById('mdImport').click()">.md ↑</button>
+      <input type="file" id="mdImport" accept=".md" onchange="importMD(this)" style="display:none">
+    </div>
+  </div>
+
+  <!-- Tasks 内容 -->
+  <div id="tasksContent">
+    <div id="tasks"></div>
+    <div id="addArea" style="display:none">
+      <div class="task">
+        <div class="task-left" style="flex:1">
+          <div style="width:20px;height:20px;flex-shrink:0;margin-right:10px"></div>
+          <input id="addInput" class="add-input" placeholder="What are you working on?" onkeydown="if(event.key==='Enter')confirmAdd()" autofocus>
+          <input id="addEst" class="add-est" type="number" min="1" max="99" value="1">
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <button class="add-cancel" onclick="cancelAdd()">Cancel</button>
+          <button class="add-confirm" onclick="confirmAdd()">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="est">Est: <strong id="estT">0</strong> pomodoros</div>
+  </div>
+
+  <!-- GTD 框架：横排四列 -->
+  <div id="gtdContent" style="display:none">
+    <div class="gtd-board">
+
+      <!-- CAPTURE -->
+      <div class="gtd-col">
+        <div class="gtd-col-header"><span>CAPTURE</span><button onclick="gtdShowAdd('inbox')">+ Add</button></div>
+        <div id="gtdAddRow_inbox" class="gtd-col-input" style="display:none"><input placeholder="type and Enter" onkeydown="if(event.key==='Enter')gtdConfirmAdd('inbox')" autofocus><button class="gtd-add-btn" onclick="gtdConfirmAdd('inbox')">+</button></div>
+        <div class="gtd-col-body" id="gtdColCapture"></div>
+      </div>
+
+      <!-- CLARIFY -->
+      <div class="gtd-col">
+        <div class="gtd-col-header"><span>CLARIFY</span><button onclick="gtdShowAdd('clarify')">+ Add</button></div>
+        <div id="gtdAddRow_clarify" class="gtd-col-input" style="display:none"><input placeholder="type and Enter" onkeydown="if(event.key==='Enter')gtdConfirmAdd('clarify')" autofocus><button class="gtd-add-btn" onclick="gtdConfirmAdd('clarify')">+</button></div>
+        <div class="gtd-col-body" id="gtdColClarify"></div>
+      </div>
+
+      <!-- NEXT ACTIONS -->
+      <div class="gtd-col">
+        <div class="gtd-col-header"><span>NEXT ACTIONS</span><button onclick="gtdShowAdd('next')">+ Add</button></div>
+        <div id="gtdAddRow_next" class="gtd-col-input" style="display:none"><input placeholder="type and Enter" onkeydown="if(event.key==='Enter')gtdConfirmAdd('next')" autofocus><button class="gtd-add-btn" onclick="gtdConfirmAdd('next')">+</button></div>
+        <div class="gtd-col-body" id="gtdColNext"></div>
+      </div>
+
+      <!-- DOING -->
+      <div class="gtd-col">
+        <div class="gtd-col-header"><span>DOING</span></div>
+        <div class="gtd-col-body" id="gtdColDoing"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// presets: mode + sub-states
+const PRESETS = {
+  '25/5': { focus: 25, shortBreak: 5, longBreak: 15, color: '#ba4949', cls: '' },
+  '52/17': { focus: 52, shortBreak: 17, longBreak: 17, color: '#38858a', cls: '' },
+  '90':    { focus: 90, shortBreak: 25, longBreak: 25, color: '#397097', cls: '' },
+};
+let pomodoroCount = 0;
+let sessions=[], sessionStart=null;
+let preset='25/5', subMode='focus', sec=25*60, run=false, iv=null, round=1, taskMode='tasks';
+let gtdItems=[], gtdId=0, gtdSelectedId=null, gtdRenamingId=null;
+let tasks=[], tid=0, defaultTasks=[
+  'Read the Pomodoro research report',
+  'Design timer UI in Figma',
+  'Plan role interaction flow',
+];
+
+const $=s=>document.getElementById(s);
+function fmt(s){ const m=Math.floor(s/60), sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+function upd(){ $('time').textContent=fmt(sec); }
+
+function renderDotGrid(){
+  const MAX = 30;
+  const count = Math.min(pomodoroCount, MAX);
+  let html = '';
+  for (let i = 0; i < MAX; i++) {
+    html += `<div class="grid-dot${i < count ? ' lit' : ''}" onclick="toggleDot(${i})"></div>`;
+  }
+  $('dotGrid').innerHTML = html;
+}
+
+function toggleDot(i){
+  pomodoroCount = i < pomodoroCount ? i : i + 1;
+  renderDotGrid();
+}
+
+function getSubTabs() {
+  const p = PRESETS[preset];
+  if (preset === '25/5') return [
+    { id:'focus', label:'Focus', color:p.color, min:p.focus },
+    { id:'break', label:'Short Break', color:'#38858a', min:p.shortBreak },
+    { id:'break-long', label:'Long Break', color:'#397097', min:p.longBreak },
+  ];
+  return [
+    { id:'focus', label:'Focus', color:p.color, min:p.focus },
+    { id:'break', label:'Break', color:p.color, min:p.shortBreak },
+  ];
+}
+
+function renderSubTabs() {
+  const tabs = getSubTabs();
+  $('subTabs').innerHTML = tabs.map(t =>
+    `<button class="tab-btn${subMode===t.id?' active':''}" data-submode="${t.id}">${t.label}</button>`
+  ).join('');
+  document.querySelectorAll('#subTabs .tab-btn').forEach(b=>b.onclick=()=>setSubMode(b.dataset.submode));
+}
+
+function setPreset(p) {
+  if(run) toggle();
+  if (p === 'custom' && !PRESETS.custom) {
+    var cp = PRESETS[preset];
+    PRESETS.custom = { focus: cp.focus, shortBreak: cp.shortBreak, longBreak: cp.shortBreak, color: '#7a5c8a', cls: '' };
+  }
+  preset=p; subMode='focus'; sec=PRESETS[p].focus*60; upd();
+  document.querySelectorAll('#presetTabs .tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.preset===p));
+  renderSubTabs(); applyColors();
+  $('startBtn').textContent='START'; $('startBtn').className='btn-start'; $('skipBtn').style.visibility='hidden';
+
+  // 自由模式专用编辑区
+  $('freeEditToggle').style.display = (p==='custom') ? 'block' : 'none';
+  $('durEdit').style.display = 'none';
+}
+
+function toggleDurEdit(){
+  var ed = $('durEdit');
+  if (ed.style.display === 'none' || !ed.style.display) {
+    if (run) return;
+    var p = PRESETS[preset];
+    $('durFocus').value = p.focus;
+    $('durBreak').value = p.shortBreak;
+    ed.style.display = 'block';
+    $('durFocus').focus();
+  } else {
+    ed.style.display = 'none';
+  }
+}
+
+function saveDuration(){
+  var f = parseInt($('durFocus').value);
+  var b = parseInt($('durBreak').value);
+  if (!f||!b||f<1||b<1) return;
+  $('durEdit').style.display = 'none';
+  PRESETS.custom = { focus: f, shortBreak: b, longBreak: b, color: '#7a5c8a', cls: '' };
+  setPreset('custom');
+}
+
+function setSubMode(m) {
+  if(run) toggle(); subMode=m;
+  const tabs = getSubTabs(); const t = tabs.find(x=>x.id===m);
+  sec=t.min*60; upd();
+  document.querySelectorAll('#subTabs .tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.submode===m));
+applyColors();
+  $('startBtn').textContent='START'; $('startBtn').className='btn-start'; $('skipBtn').style.visibility=(m==='focus'?'hidden':'visible');
+
+}
+
+function applyColors() {
+  const tabs = getSubTabs(); const t = tabs.find(x=>x.id===subMode);
+  document.body.style.background = t.color;
+  if (subMode==='focus') {
+    document.body.className = PRESETS[preset].cls;
+  } else if (subMode==='break') {
+    document.body.className = 'mode--break-short';
+  } else {
+    document.body.className = 'mode--break-long';
+  }
+  $('startBtn').style.color = t.color;
+  document.querySelectorAll('.task-dot.done').forEach(d=>{ d.style.background=t.color; d.style.borderColor=t.color; });
+  document.documentElement.style.setProperty('--accent', t.color);
+}
+
+function setMode(m){ subMode=m; } // alias for compatibility
+
+function toggle(){
+  run=!run; $('startBtn').textContent=run?'PAUSE':'START'; $('startBtn').className='btn-start'+(run?' is-paused':'');
+  $('startBtn').style.color = run ? '#fff' : (getSubTabs().find(x=>x.id===subMode)?.color || '#ba4949');
+  $('skipBtn').style.visibility=run?'visible':(subMode==='focus'?'hidden':'visible');
+  if(run){
+    if(subMode==='focus') sessionStart = new Date().toISOString();
+    iv=setInterval(()=>{ sec--; upd(); if(sec<=0){ clearInterval(iv); run=false; $('startBtn').textContent='START'; $('startBtn').className='btn-start';
+    if(subMode==='focus'){
+      const end = new Date().toISOString();
+      const dur = Math.round(PRESETS[preset].focus - sec/60);
+      const doingItem = gtdItems.find(x=>x.col==='doing');
+      sessions.push({ start:sessionStart, end:end, duration:dur, preset:preset, mode:'focus', task:doingItem?doingItem.text:'' });
+      sessionStart = null;
+      pomodoroCount++; renderDotGrid();
+      round++; $('round')?.textContent && ($('round').textContent=`#${round}`);
+      const tabs = getSubTabs();
+      setSubMode(round%4===0 && preset==='25/5' ? 'break-long' : 'break');
+    } else setSubMode('focus');
+  }},1000); } else { clearInterval(iv); sessionStart = null; }
+}
+
+function skip(){ if(run)toggle(); if(subMode==='focus'){ pomodoroCount++; renderDotGrid(); round++; const tabs=getSubTabs(); setSubMode(round%4===0&&preset==='25/5'?'break-long':'break'); } else setSubMode('focus'); }
+
+function setTaskMode(mode){
+  taskMode=mode;
+  document.querySelectorAll('#taskModeTabs .tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.taskmode===mode));
+  $('taskModeLabel').textContent = mode==='tasks' ? 'Tasks' : 'GTD';
+  $('addTaskBtn').style.display = mode==='tasks' ? 'inline-block' : 'none';
+  $('tasksContent').style.display = mode==='tasks' ? 'block' : 'none';
+  $('gtdContent').style.display = mode==='gtd' ? 'block' : 'none';
+  document.querySelector('.tasks-wrap').style.maxWidth = mode==='gtd' ? '1400px' : '480px';
+}
+
+// ── GTD: 四列横排，自由填充 ──
+function gtdShowAdd(col){
+  const row = $('gtdAddRow_'+col);
+  row.style.display = 'flex';
+  row.querySelector('input').focus();
+}
+
+function gtdConfirmAdd(col){
+  const inp = $('gtdAddRow_'+col).querySelector('input');
+  const v = inp.value.trim();
+  if(!v){ inp.focus(); return; }
+  gtdItems.push({ id:gtdId++, text:v, col:col });
+  inp.value = '';
+  $('gtdAddRow_'+col).style.display = 'none';
+  renderGtd();
+}
+
+function gtdMove(id, col){
+  const item = gtdItems.find(x=>x.id===id);
+  if(item) item.col = col;
+  renderGtd();
+}
+function gtdRemove(id){
+  gtdItems = gtdItems.filter(x=>x.id!==id);
+  renderGtd();
+}
+
+function gtdSelect(id){ gtdSelectedId = gtdSelectedId===id ? null : id; renderGtd(); }
+function gtdRenameStart(id){ gtdRenamingId = id; gtdSelectedId = null; renderGtd(); }
+function gtdRenameSave(id, val){
+  const v = val.trim();
+  if(v){ const item = gtdItems.find(x=>x.id===id); if(item) item.text = v; }
+  gtdRenamingId = null; renderGtd();
+}
+function gtdRenameCancel(){ gtdRenamingId = null; renderGtd(); }
+
+function renderGtd(){
+  const COLS = { inbox:$('gtdColCapture'), clarify:$('gtdColClarify'), next:$('gtdColNext'), doing:$('gtdColDoing') };
+  const ACTIONS = {
+    inbox:   [{col:'clarify',label:'Clarify'},{col:'next',label:'Next'}],
+    clarify: [{col:'inbox',label:'Back'},{col:'next',label:'Next'}],
+    next:    [{col:'clarify',label:'Back'},{col:'doing',label:'Do'}],
+    doing:   [{col:'next',label:'Back'},{del:true,label:'Done'}],
+  };
+
+  Object.entries(COLS).forEach(([col,container])=>{
+    const items = gtdItems.filter(x=>x.col===col);
+    let html = '';
+    if(col==='clarify') html += '<div class="gtd-guide"><b>Is it actionable?</b><br><span class="gtd-guide-no">NO</span> → discard, save for reference, or maybe later<br><span class="gtd-guide-yes">YES</span> → what\'s the next step?<br>&nbsp;&nbsp;&nbsp;&nbsp;Quick (&lt;2min) → just do it<br>&nbsp;&nbsp;&nbsp;&nbsp;Assign it → delegate<br>&nbsp;&nbsp;&nbsp;&nbsp;Queue it → <b>[Next]</b></div>';
+    if(items.length===0 && col!=='clarify') html += '<div class="gtd-col-empty">—</div>';
+    items.forEach(item=>{
+      const sel = item.id===gtdSelectedId;
+      html += `<div class="gtd-col-item${sel?' selected':''}" onclick="gtdSelect(${item.id})">`;
+      if(item.id===gtdRenamingId) html += `<input value="${item.text}" onkeydown="if(event.key==='Enter')gtdRenameSave(${item.id},this.value);if(event.key==='Escape')gtdRenameCancel()" onblur="gtdRenameCancel()" autofocus onclick="event.stopPropagation()" style="flex:1;min-width:0;border:1px solid var(--accent,#ba4949);border-radius:3px;padding:2px 6px;font-size:14px;font-family:inherit;outline:none">`;
+      else html += `<span style="flex:1;min-width:0">${item.text}</span>`;
+      html += `<button class="gtd-item-x" onclick="event.stopPropagation();gtdRemove(${item.id})">×</button></div>`;
+      if(sel){
+        const acts = ACTIONS[item.col]||[];
+        html += '<div class="gtd-action-bar">';
+        acts.forEach(a=>{
+          if(a.del) html += `<button class="gtd-act-done" onclick="event.stopPropagation();gtdRemove(${item.id});gtdSelectedId=null">${a.label}</button>`;
+          else html += `<button onclick="event.stopPropagation();gtdMove(${item.id},'${a.col}');gtdSelectedId=null">${a.label}</button>`;
+        });
+        html += `<button onclick="event.stopPropagation();gtdRenameStart(${item.id})">Rename</button>`;
+        html += '</div>';
+      }
+    });
+    container.innerHTML = html;
+  });
+}
+
+function add(){ $('addArea').style.display='block'; $('addInput').focus(); }
+function confirmAdd(){ const t=$('addInput').value.trim(); if(!t)return; const e=parseInt($('addEst').value)||1; tasks.push({id:tid++,text:t,est:e,done:false}); $('addInput').value=''; $('addEst').value='1'; $('addArea').style.display='none'; render(); }
+function cancelAdd(){ $('addInput').value=''; $('addArea').style.display='none'; }
+function toggleTask(id){ const t=tasks.find(x=>x.id===id); t.done=!t.done; render(); }
+function del(id){ tasks=tasks.filter(x=>x.id!==id); render(); }
+function render(){
+  $('tasks').innerHTML=tasks.map(t=>`
+    <div class="task"><div class="task-left">
+      <div class="task-dot${t.done?' done':''}" onclick="toggleTask(${t.id})"></div>
+      <span class="task-text${t.done?' done':''}">${t.text}</span><span class="task-pomos">${t.est}p</span>
+    </div><button class="task-del" onclick="del(${t.id})">×</button></div>
+  `).join('');
+  $('estT').textContent=tasks.reduce((s,t)=>s+(t.done?0:t.est),0);
+}
+
+defaultTasks.forEach(t=>{ tasks.push({id:tid++,text:t,est:1,done:false}); });
+document.querySelectorAll('#presetTabs .tab-btn').forEach(b=>b.onclick=()=>setPreset(b.dataset.preset));
+document.querySelectorAll('#taskModeTabs .tab-btn').forEach(b=>b.onclick=()=>setTaskMode(b.dataset.taskmode));
+renderSubTabs(); applyColors(); upd(); render(); renderDotGrid();
+
+function exportMD(){
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0,10);
+  const ts = now.toISOString();
+
+  let md = '';
+
+  // ── Agent instruction header ──
+  md += `# Pomodoro Session Log\n\n`;
+  md += `> **Agent Instructions**\n`;
+  md += `> This file logs one day's pomodoro sessions, tasks, and GTD workflow. Parse sections by \`##\` headers.\n`;
+  md += `> - \`## Sessions\`: each entry has \`start\`, \`end\` (ISO 8601), \`duration\` (min), \`preset\`, \`task\`.\n`;
+  md += `> - \`## Tasks\`: \`- [x]\` = done, \`- [ ]\` = pending. \`(Np)\` = estimated pomodoros.\n`;
+  md += `> - \`## GTD Board\`: \`### Inbox/Clarify/Next Actions/Doing\`. Items under \`Doing\` were the focus target.\n`;
+  md += `> Generated: ${ts}\n\n`;
+  md += `---\n\n`;
+
+  // ── Metadata ──
+  const totalMin = sessions.reduce((s,x)=>s+x.duration,0);
+  md += `## Summary\n\n`;
+  md += `- Date: **${dateStr}**\n`;
+  md += `- Sessions completed: **${sessions.length}**\n`;
+  md += `- Total focus time: **${totalMin} min**\n`;
+  md += `- Dot-grid count: **${pomodoroCount}**\n`;
+  md += `- Tasks pending: **${tasks.filter(t=>!t.done).length}** / total: **${tasks.length}**\n`;
+  md += `- GTD items in flow: **${gtdItems.length}**\n\n`;
+
+  // ── Sessions ──
+  if(sessions.length){
+    md += `## Sessions\n\n`;
+    sessions.forEach((s,i)=>{
+      md += `### ${i+1}. ${s.task||'Untitled'}\n\n`;
+      md += `- start: \`${s.start}\`\n`;
+      md += `- end:   \`${s.end}\`\n`;
+      md += `- duration: ${s.duration} min\n`;
+      md += `- preset: ${s.preset}\n`;
+      md += `- mode: ${s.mode}\n\n`;
+    });
+  } else {
+    md += `## Sessions\n\n_No sessions recorded yet._\n\n`;
+  }
+
+  // ── Tasks ──
+  md += `## Tasks\n\n`;
+  if(tasks.length){
+    tasks.forEach(t=>{ md += `- [${t.done?'x':' '}] ${t.text}${t.est>1 ? ' ('+t.est+'p)' : ''}\n`; });
+  } else {
+    md += `_No tasks._\n`;
+  }
+  md += '\n';
+
+  // ── GTD Board ──
+  md += `## GTD Board\n\n`;
+  if(gtdItems.length){
+    const cols = ['inbox','clarify','next','doing'];
+    const labels = { inbox:'Inbox', clarify:'Clarify', next:'Next Actions', doing:'Doing' };
+    cols.forEach(col=>{
+      const items = gtdItems.filter(x=>x.col===col);
+      if(items.length){
+        md += `### ${labels[col]}\n\n`;
+        items.forEach(i=>{ md += `- [ ] ${i.text}\n`; });
+        md += '\n';
+      }
+    });
+  } else {
+    md += `_No GTD items._\n\n`;
+  }
+
+  md += `---\n`;
+  md += `> End of log · Generated ${ts}\n`;
+
+  // Download
+  const blob = new Blob([md], {type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pomodoro-${dateStr}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importMD(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    const text = reader.result;
+    const colMap = { 'inbox':'inbox', 'clarify':'clarify', 'next actions':'next', 'doing':'doing' };
+
+    // Parse Tasks section
+    const taskMatch = text.match(/## Tasks\n([\s\S]*?)(?=\n## |$)/);
+    if(taskMatch){
+      tasks = [];
+      const lines = taskMatch[1].split('\n');
+      lines.forEach(line=>{
+        const m = line.match(/^- \[(.)\] (.+?)(?: \((\d+)p\))?\s*$/);
+        if(m){
+          tasks.push({ id:tid++, text:m[2].trim(), est:parseInt(m[3])||1, done:m[1]==='x' });
+        }
+      });
+    }
+
+    // Parse GTD Board section
+    const gtdMatch = text.match(/## GTD Board\n([\s\S]*?)(?=\n## |\n---|$)/);
+    if(gtdMatch){
+      gtdItems = [];
+      const sections = gtdMatch[1].split(/### /);
+      sections.forEach(sec=>{
+        const headerMatch = sec.match(/^(.+?)\n/);
+        if(!headerMatch) return;
+        const colName = headerMatch[1].trim().toLowerCase();
+        const col = colMap[colName];
+        if(!col) return;
+        const lines = sec.split('\n').slice(1);
+        lines.forEach(line=>{
+          const m = line.match(/^- \[.\] (.+)$/);
+          if(m){
+            gtdItems.push({ id:gtdId++, text:m[1].trim(), col:col });
+          }
+        });
+      });
+    }
+
+    render(); renderGtd();
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>

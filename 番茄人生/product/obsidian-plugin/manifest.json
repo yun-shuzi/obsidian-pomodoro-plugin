@@ -1,0 +1,10 @@
+{
+  "id": "tomato-life",
+  "name": "Pomodoro",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "GTD pomodoro timer with 4-column kanban. Capture → Clarify → Next Actions → Do. Session logs written to vault as .md for Agent analysis.",
+  "author": "番茄人生",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
