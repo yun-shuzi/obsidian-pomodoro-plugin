@@ -32,6 +32,20 @@ export class DataManager {
     return `${base}/${dateStr || this.getTodayStr()}.md`;
   }
 
+  /** 确保导出目录存在 */
+  async ensureFolder(): Promise<void> {
+    const base = this.settings.exportPath || 'Pomodoro Logs';
+    const parts = base.split('/');
+    let current = '';
+    for (const part of parts) {
+      current += (current ? '/' : '') + part;
+      const folder = this.app.vault.getAbstractFileByPath(current);
+      if (!folder) {
+        await this.app.vault.createFolder(current);
+      }
+    }
+  }
+
   /** 创建新的每日日志文件（含所有段落模板） */
   private makeLogTemplate(dateStr: string): string {
     return [

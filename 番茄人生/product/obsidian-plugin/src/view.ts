@@ -83,14 +83,40 @@ export class TomatoView extends ItemView {
     container.querySelectorAll('#tl-taskModeTabs .tl-tab-btn').forEach(b =>
       (b as HTMLElement).onclick = () => this.setTaskMode((b as HTMLElement).dataset.taskmode!)
     );
+
+    this.startPolling();
   }
 
   async onClose(): Promise<void> {
     if (this.iv) clearInterval(this.iv);
     // 确保最新数据已保存
-    await this.data.saveGtdItems(this.gtdItems);
-    await this.data.saveTasks(this.tasks);
+    this.stopPolling();
   }
+
+  // ═══════════════════════ 文件轮询 ═══════════════════════
+
+  private writing = false;
+  private pollTimer: ReturnType<typeof setInterval> | null = null;
+  private tasksFingerprint = '';
+  private gtdFingerprint = '';
+
+  private startPolling(): void {
+    const tasksPath = this.data.getTasksPath();
+    const gtdPath = this.data.getGtdPath();
+    this.updateTaskFingerprint(); this.updateGtdFingerprint();
+    this.pollTimer = setInterval(async () => {
+      if (this.writing) { this.updateTaskFingerprint(); this.updateGtdFingerprint(); return; }
+      try {
+        const tasksFile = this.app.vault.getAbstractFileByPath(tasksPath);
+        if (tasksFile) { const c = await this.app.vault.read(tasksFile as any); if (c !== this.tasksFingerprint) { this.tasksFingerprint = c; this.tasks = await this.data.loadTasks(); this.tid = this.tasks.length > 0 ? Math.max(...this.tasks.map(t => t.id)) + 1 : 0; this.renderTasks(); } }
+        const gtdFile = this.app.vault.getAbstractFileByPath(gtdPath);
+        if (gtdFile) { const c = await this.app.vault.read(gtdFile as any); if (c !== this.gtdFingerprint) { this.gtdFingerprint = c; this.gtdItems = await this.data.loadGtdItems(); this.gtdId = this.gtdItems.length > 0 ? Math.max(...this.gtdItems.map(i => i.id)) + 1 : 0; this.renderGtd(); } }
+      } catch {}
+    }, 2000);
+  }
+  private updateTaskFingerprint(): void { const f = this.app.vault.getAbstractFileByPath(this.data.getTasksPath()); if (f) this.app.vault.read(f as any).then(c => { this.tasksFingerprint = c; }).catch(() => {}); }
+  private updateGtdFingerprint(): void { const f = this.app.vault.getAbstractFileByPath(this.data.getGtdPath()); if (f) this.app.vault.read(f as any).then(c => { this.gtdFingerprint = c; }).catch(() => {}); }
+  private stopPolling(): void { if (this.pollTimer) { clearInterval(this.pollTimer); this.pollTimer = null; } }
 
   // ═══════════════════════ UI 构建（一次性） ═══════════════════════
 
@@ -399,6 +425,7 @@ export class TomatoView extends ItemView {
   }
 
   private onTimerEnd(): void {
+    this.playBell();
     if (this.subMode === 'focus') {
       // 记录 session
       const end = new Date().toISOString();
@@ -443,6 +470,22 @@ export class TomatoView extends ItemView {
     } else {
       this.setSubMode('focus');
     }
+  }
+
+  private playBell(): void {
+    try {
+      const ctx = new AudioContext();
+      const now = ctx.currentTime;
+      const notes = [659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, now + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.4);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.4);
+      });
+    } catch {}
   }
 
   // ═══════════════════════ 点阵 ═══════════════════════

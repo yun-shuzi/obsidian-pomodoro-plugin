@@ -92,8 +92,12 @@ export default class TomatoPlugin extends Plugin {
       return;
     }
 
-    // 在主编辑区创建标签页（和笔记一样的位置）
-    const leaf = this.app.workspace.getLeaf('tab');
-    await leaf.setViewState({ type: VIEW_TYPE, active: true });
+    // 主编辑区创建标签页，防御性检查避免关闭时报错
+    try {
+      const leaf = this.app.workspace.getLeaf('tab');
+      await leaf.setViewState({ type: VIEW_TYPE, active: true });
+    } catch {
+      // 正在关闭 Obsidian 时可能无可用标签组，静默忽略
+    }
   }
 }
