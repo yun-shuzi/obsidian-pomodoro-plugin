@@ -427,8 +427,11 @@ var TomatoView = class extends import_obsidian.ItemView {
       if (this.subMode === "focus") {
         this.sessionStart = (/* @__PURE__ */ new Date()).toISOString();
       }
+      const startMs = Date.now();
+      const totalSec = this.sec;
       this.iv = setInterval(() => {
-        this.sec--;
+        const elapsed = Math.floor((Date.now() - startMs) / 1e3);
+        this.sec = Math.max(0, totalSec - elapsed);
         this.upd();
         if (this.sec <= 0) {
           clearInterval(this.iv);
@@ -490,19 +493,20 @@ var TomatoView = class extends import_obsidian.ItemView {
   playBell() {
     try {
       const ctx = new AudioContext();
+      if (ctx.state === "suspended") ctx.resume();
       const now = ctx.currentTime;
-      const notes = [659.25, 783.99, 1046.5];
+      const notes = [1046.5, 783.99, 659.25, 523.25];
       notes.forEach((freq, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = "sine";
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.3, now + i * 0.15);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.4);
+        gain.gain.setValueAtTime(0.6, now + i * 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.2 + 0.6);
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.start(now + i * 0.15);
-        osc.stop(now + i * 0.15 + 0.4);
+        osc.start(now + i * 0.2);
+        osc.stop(now + i * 0.2 + 0.7);
       });
     } catch {
     }
