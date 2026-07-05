@@ -87,6 +87,12 @@ Copy-Item "main.js","styles.css","manifest.json" "D:\obsidian\云枢的铃铛\.o
 
 - **`onClose()` 必须 `clearInterval(this.iv) + stopPolling()`**，否则计时器泄漏
 - **`ensureFolder()` 不能删**——所有文件写入依赖它创建目录，删了则全部保存静默失败
+- **计时器不要用 `sec--` 计数**：Obsidian 最小化后浏览器节流 `setInterval`，必须用 `Date.now()` 计算实际耗时。代码模式：
+  ```ts
+  const startMs = Date.now(); const totalSec = this.sec;
+  this.iv = setInterval(() => { this.sec = Math.max(0, totalSec - Math.floor((Date.now() - startMs)/1000)); }, 1000);
+  ```
+- **铃声必须 `ctx.resume()`**：Electron 后台时 AudioContext 可能被挂起，播前先恢复
 - **GTD 输入行是列体兄弟元素**，`renderGtd()` 只改 `innerHTML` 不碰输入行
 - **GTD 跳转约束**：只有 NEXT ACTIONS 的 [Do] 可进入 DOING
 - **构建产物 CJS**（`format: "cjs"`），`external: ["obsidian"]`
