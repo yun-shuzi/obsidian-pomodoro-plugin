@@ -105,9 +105,3 @@ Copy-Item "main.js","styles.css","manifest.json" "D:\obsidian\云枢的铃铛\.o
 1. 用**极短且绝对唯一**的字符串做 oldString（如 `if (this.subMode === 'focus')`）
 2. 每次只改一处，改完就构建验证
 3. 如果截断了，`git checkout HEAD -- product/obsidian-plugin/src/view.ts` 恢复
-
-## v1.0 遗留代码（不要碰）
-
-- `packages/server/` · `packages/client/` · `docs/api/` · `docker-compose.yml`
-
-**除非用户明确说要改，永远无视这些目录。**
