@@ -75,9 +75,3 @@ CAPTURE  →  CLARIFY  →  NEXT ACTIONS  →  DOING
 - **后端**：Fastify + Drizzle + PostgreSQL（pgvector）
 - **LLM**：DeepSeek `deepseek-chat`
 - **客户端**：Expo React Native（待开发）
-
----
-
-## 四、与 v1.0 的关系
-
-v1.0 的 AI 角色养成、人格系统、投喂机制等设计已归档至 `docs/历史/PRD_原始版本.md`。当前 v2.0 不删除这些概念，但开发优先级：GTD 框架 + 番茄钟 + 数据闭环 > 角色系统。
